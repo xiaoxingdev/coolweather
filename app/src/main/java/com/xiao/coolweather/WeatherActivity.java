@@ -1,6 +1,6 @@
 package com.xiao.coolweather;
 
-import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.xiao.coolweather.gson.Forecast;
 import com.xiao.coolweather.gson.Weather;
+import com.xiao.coolweather.service.AutoUpdateService;
 import com.xiao.coolweather.util.HttpUtil;
 import com.xiao.coolweather.util.Utility;
 
@@ -43,7 +44,6 @@ public class WeatherActivity extends AppCompatActivity
     private TextView comfortText;
     private TextView carwashText;
     private TextView sportText;
-    private ProgressDialog progressDialog;
     private ImageView bingPicImg;
     public SwipeRefreshLayout swipeRefresh;
     private String mWeatherId;
@@ -226,8 +226,6 @@ public class WeatherActivity extends AppCompatActivity
 
     private void showWeatherInfo(Weather weather)
     {
-        showProgressDialog();
-
         String cityName = weather.basic.cityName;
         String updateTime = weather.basic.update.updateTime.split(" ")[1];
         String degree = weather.now.temperature + "℃";
@@ -266,21 +264,7 @@ public class WeatherActivity extends AppCompatActivity
         sportText.setText(sport);
         weatherLayout.setVisibility(View.VISIBLE);
 
-        closeProgressDialog();
-    }
-
-    private void closeProgressDialog()
-    {
-        if (progressDialog != null) progressDialog.dismiss();
-    }
-    private void showProgressDialog()
-    {
-        if (progressDialog == null)
-        {
-            progressDialog = new ProgressDialog(this);
-            progressDialog.setTitle("正在加载...");
-            progressDialog.setCanceledOnTouchOutside(false);
-        }
-        progressDialog.show();
+        Intent intent = new Intent(this, AutoUpdateService.class);
+        startService(intent);
     }
 }
