@@ -2,9 +2,11 @@ package com.xiao.coolweather.util;
 
 import android.text.TextUtils;
 
+import com.google.gson.Gson;
 import com.xiao.coolweather.db.City;
 import com.xiao.coolweather.db.County;
 import com.xiao.coolweather.db.Province;
+import com.xiao.coolweather.gson.Weather;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,6 +24,7 @@ public class Utility
 {
     /**
      * 解析和处理服务器返回的省级数据
+     *
      * @param response
      * @return
      */
@@ -32,7 +35,8 @@ public class Utility
             try
             {
                 JSONArray allProvinces = new JSONArray(response);
-                for (int i = 0; i < allProvinces.length(); i++) {
+                for (int i = 0; i < allProvinces.length(); i++)
+                {
                     JSONObject provinceObject = allProvinces.getJSONObject(i);
 
                     Province province = new Province();
@@ -40,9 +44,8 @@ public class Utility
                     province.setCode(provinceObject.getInt("id"));
 
                     province.save();
-
-                    return true;
                 }
+                return true;
             }
             catch (JSONException e)
             {
@@ -55,6 +58,7 @@ public class Utility
 
     /**
      * 解析和处理服务器返回的市级数据
+     *
      * @param response
      * @return
      */
@@ -65,7 +69,8 @@ public class Utility
             try
             {
                 JSONArray allProvinces = new JSONArray(response);
-                for (int i = 0; i < allProvinces.length(); i++) {
+                for (int i = 0; i < allProvinces.length(); i++)
+                {
                     JSONObject provinceObject = allProvinces.getJSONObject(i);
 
                     City city = new City();
@@ -74,9 +79,8 @@ public class Utility
                     city.setProvinceId(provinceId);
 
                     city.save();
-
-                    return true;
                 }
+                return true;
             }
             catch (JSONException e)
             {
@@ -89,6 +93,7 @@ public class Utility
 
     /**
      * 解析和处理服务器返回的县级数据
+     *
      * @param response
      * @return
      */
@@ -99,7 +104,8 @@ public class Utility
             try
             {
                 JSONArray allProvinces = new JSONArray(response);
-                for (int i = 0; i < allProvinces.length(); i++) {
+                for (int i = 0; i < allProvinces.length(); i++)
+                {
                     JSONObject provinceObject = allProvinces.getJSONObject(i);
 
                     County county = new County();
@@ -108,9 +114,8 @@ public class Utility
                     county.setCityId(cityId);
 
                     county.save();
-
-                    return true;
                 }
+                return true;
             }
             catch (JSONException e)
             {
@@ -118,5 +123,28 @@ public class Utility
             }
         }
         return false;
+    }
+
+
+    /**
+     * 将返回的JSON数据解析成Weather实体类
+     *
+     * @param response
+     * @return
+     */
+    public static Weather handleWeatherResponse(String response)
+    {
+        try
+        {
+            JSONObject jsonObject = new JSONObject(response);
+            JSONArray jsonArray = jsonObject.getJSONArray("HeWeather");
+            String weatherContent = jsonArray.getJSONObject(0).toString();
+            return new Gson().fromJson(weatherContent, Weather.class);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

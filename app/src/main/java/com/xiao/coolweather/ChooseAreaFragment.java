@@ -1,6 +1,7 @@
 package com.xiao.coolweather;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -59,7 +60,7 @@ public class ChooseAreaFragment extends Fragment
     private City selectedCity;
     private County selectedCounty;
 
-    private int currentLevel;
+    private int currentLevel = 0;
 
     private ProgressDialog progressDialog;
 
@@ -73,7 +74,7 @@ public class ChooseAreaFragment extends Fragment
         backButton = view.findViewById(R.id.back_button);
         listView = view.findViewById(R.id.list_view);
 
-        adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
+        adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, dataList);
         listView.setAdapter(adapter);
 
         return view;
@@ -98,6 +99,13 @@ public class ChooseAreaFragment extends Fragment
                         selectedCity = cityList.get(position);
                         queryCounties();
                         break;
+                    case LEVEL_COUNTY:
+                        String weatherId = countyList.get(position).getWeatherId();
+                        Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                        intent.putExtra("weather_id", weatherId);
+                        startActivity(intent);
+                        getActivity().finish();
+                        break;
                     default:
                         break;
                 }
@@ -115,7 +123,7 @@ public class ChooseAreaFragment extends Fragment
                         queryCities();
                         break;
                     case LEVEL_CITY:
-                        queryProvince();
+                        queryProvinces();
                         break;
                     default:
                         break;
@@ -123,9 +131,9 @@ public class ChooseAreaFragment extends Fragment
             }
         });
 
-        queryProvince();
+        queryProvinces();
     }
-    private void queryProvince()
+    private void queryProvinces()
     {
         titleText.setText("中国");
         backButton.setVisibility(View.GONE);
@@ -233,9 +241,9 @@ public class ChooseAreaFragment extends Fragment
                         {
                             closeProgressDialog();
 
-                            if ("province".equals(type)) queryProvince();
+                            if ("province".equals(type)) queryProvinces();
                             else if ("city".equals(type)) queryCities();
-                            else if ("county".equals(type)) queryProvince();
+                            else if ("county".equals(type)) queryCounties();
                         }
                     });
                 }
